@@ -1,4 +1,4 @@
-module "dsvm" {
+module "data_integration" {
   source = "../../modules/data_integration"
   #kv_uri                        = module.permanent_infra.key_vault_uri_out
   rg_vnet1_name                 = "vm_infra"
@@ -34,22 +34,17 @@ module "dsvm" {
   contgroup_network_profile_name         = "contgroup1"
   container_group1_name                  = "ac1-cg1"
 
-  ip_address_type = "Private"
-  #  dns_name_label  = "drhaci"
-  os_type = "Linux"
-
+  ip_address_type        = "Private"
+  os_type                = "Linux"
   container_group1_count = 1
   container_name         = "drh-sql"
   container_image        = "exoplatform/sqlserver:2017-CU8"
 
-  synapse_rg_name                    = "synapse"
-  syapse_rg_location                 = "East US"
   synapse_sql_server_name            = "databrickssql"
   synapse_sa_sql_database_name       = "databrickssqldb"
   sql_svradmin_login_name_secret     = "sql-svradmin-login-name"
   sql_svradmin_login_password_secret = "sql-svradmin-login-password"
   permanent_infra_key_vault_name     = "drh-infra-keyvault1"
-  databricks_resource_group_name     = "databricks_rg1"
 }
 /*
 # use this information for data resources then delete

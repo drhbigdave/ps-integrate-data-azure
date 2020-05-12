@@ -1,4 +1,3 @@
-# vnet_infra
 variable "rg_vnet1_name" {}
 variable "rg_vnet1_location" {}
 variable "vnet1_name" {}
@@ -18,8 +17,6 @@ variable "synapse_sa_sql_database_name" {}
 variable "permanent_infra_key_vault_name" {}
 variable "sql_svradmin_login_name_secret" {}
 variable "sql_svradmin_login_password_secret" {}
-variable "databricks_resource_group_name" {}
-
 # dvsm
 variable "network_interface_name" {}
 variable "dsvm_admin_password_secret_name" {}
@@ -39,7 +36,6 @@ variable "vnet1_container_subnet_address_prefix2" {}
 variable "contgroup_network_profile_name" {}
 variable "container_group1_name" {}
 variable "ip_address_type" {}
-variable "dns_name_label" {}
 variable "os_type" {}
 variable "container_group1_count" {}
 variable "container_name" {}

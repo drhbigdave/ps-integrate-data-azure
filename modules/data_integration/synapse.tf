@@ -1,19 +1,7 @@
-/*
-resource "azurerm_resource_group" "synapse_rg" {
-  name     = var.synapse_rg_name
-  location = var.syapse_rg_location
-}
-*/
-# leaving the create resource group ^ and the use the resource group
-# from below to have the working rg for another day and to add to the
-# databricks resources for the pluralsight Databricks course.
-
 resource "azurerm_sql_server" "synapse_sql_server" {
-  name                = var.synapse_sql_server_name
-  resource_group_name = data.azurerm_resource_group.databricks_rg.name
-  location            = data.azurerm_resource_group.databricks_rg.location
-  #resource_group_name          = azurerm_resource_group.synapse_rg.name
-  #location                     = azurerm_resource_group.synapse_rg.location
+  name                         = var.synapse_sql_server_name
+  location                     = azurerm_resource_group.vnet_infra.location
+  resource_group_name          = azurerm_resource_group.vnet_infra.name
   version                      = "12.0"
   administrator_login          = data.azurerm_key_vault_secret.sql_svradmin_login_name.value
   administrator_login_password = data.azurerm_key_vault_secret.sql_svradmin_login_password.value
@@ -21,6 +9,21 @@ resource "azurerm_sql_server" "synapse_sql_server" {
   tags = {
     environment = "pluralsight"
   }
+}
+
+resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_drh" {
+  name                = "davids_home"
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+  server_name         = azurerm_sql_server.synapse_sql_server.name
+  start_ip_address    = data.azurerm_key_vault_secret.davids_home_ip.value
+  end_ip_address      = data.azurerm_key_vault_secret.davids_home_ip.value
+}
+resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_sd" {
+  name                = "Shanikas_home"
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+  server_name         = azurerm_sql_server.synapse_sql_server.name
+  start_ip_address    = data.azurerm_key_vault_secret.shanikas_home_ip.value
+  end_ip_address      = data.azurerm_key_vault_secret.shanikas_home_ip.value
 }
 /*
 resource "azurerm_storage_account" "synapse_sa" {
@@ -33,13 +36,11 @@ resource "azurerm_storage_account" "synapse_sa" {
 */
 resource "azurerm_sql_database" "synapse_sa_sql_database" {
   name                = var.synapse_sa_sql_database_name
-  resource_group_name = data.azurerm_resource_group.databricks_rg.name
-  location            = data.azurerm_resource_group.databricks_rg.location
-  #resource_group_name = azurerm_resource_group.synapse_rg.name
-  #location            = azurerm_resource_group.synapse_rg.location
-  server_name = azurerm_sql_server.synapse_sql_server.name
-  create_mode = "Default"
-  edition     = "DataWarehouse"
+  location            = azurerm_resource_group.vnet_infra.location
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+  server_name         = azurerm_sql_server.synapse_sql_server.name
+  create_mode         = "Default"
+  edition             = "Free"
   /*
   extended_auditing_policy {
     storage_endpoint                        = azurerm_storage_account.synapse_sa.primary_blob_endpoint

@@ -30,11 +30,6 @@ resource "azurerm_network_interface_security_group_association" "dsvm_assoc" {
   network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
 }
 
-data "azurerm_key_vault_secret" "dsvm_admin_password" {
-  name         = var.dsvm_admin_password_secret_name
-  key_vault_id = var.kv_id
-}
-
 resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
   count               = var.dsvm_count
   name                = var.dsvm_vm1_name

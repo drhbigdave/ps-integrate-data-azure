@@ -22,3 +22,7 @@ data "azurerm_key_vault_secret" "sql_svradmin_login_password" {
   name         = var.sql_svradmin_login_password_secret
   key_vault_id = data.azurerm_key_vault.permanent_infra_kv1.id
 }
+data "azurerm_key_vault_secret" "dsvm_admin_password" {
+  name         = var.dsvm_admin_password_secret_name
+  key_vault_id = data.azurerm_key_vault.permanent_infra_kv1.id
+}
