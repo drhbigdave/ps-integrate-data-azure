@@ -44,9 +44,17 @@ resource "azurerm_container_group" "container_group1" {
     image  = var.container_image
     cpu    = "0.5"
     memory = "1.5"
+    environment_variables = {
+      terSQLSERVER_DATABASE = "Pollution",
+    }
+    secure_environment_variables = {
+      SA_PASSWORD        = data.azurerm_key_vault_secret.sql_sa_password.value,
+      SQLSERVER_USER     = data.azurerm_key_vault_secret.sql_server_user.value,
+      SQLSERVER_PASSWORD = data.azurerm_key_vault_secret.sql_server_user_password.value,
+    }
 
     ports {
-      port     = 8080
+      port     = 1433
       protocol = "TCP"
     }
   }

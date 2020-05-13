@@ -40,3 +40,6 @@ variable "os_type" {}
 variable "container_group1_count" {}
 variable "container_name" {}
 variable "container_image" {}
+variable "sql_sa_password_secret_name" {}
+variable "sql_server_user_secret_name" {}
+variable "sql_server_user_password_secret_name" {}

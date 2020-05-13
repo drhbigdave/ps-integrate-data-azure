@@ -31,8 +31,11 @@ module "data_integration" {
 
   container_subnet_name                  = "container_subnet_dot3"
   vnet1_container_subnet_address_prefix2 = "10.0.3.0/24"
-  contgroup_network_profile_name         = "contgroup1"
-  container_group1_name                  = "ac1-cg1"
+  contgroup_network_profile_name         = "pscontgroup1"
+  container_group1_name                  = "ac1-cg1-ps"
+  sql_sa_password_secret_name            = "sql-sa-password"
+  sql_server_user_secret_name            = "sql-server-user"
+  sql_server_user_password_secret_name   = "sql-server-user-password"
 
   ip_address_type        = "Private"
   os_type                = "Linux"
