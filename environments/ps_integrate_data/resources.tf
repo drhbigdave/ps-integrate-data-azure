@@ -28,20 +28,27 @@ module "data_integration" {
   vm_offer     = "WindowsServer"
   vm_sku       = "2019-datacenter-gensecond"
   vm_version   = "latest"
-
+  #ACI
   container_subnet_name                  = "container_subnet_dot3"
   vnet1_container_subnet_address_prefix2 = "10.0.3.0/24"
   contgroup_network_profile_name         = "pscontgroup1"
   container_group1_name                  = "ac1-cg1-ps"
-  sql_sa_password_secret_name            = "sql-sa-password"
-  sql_server_user_secret_name            = "sql-server-user"
-  sql_server_user_password_secret_name   = "sql-server-user-password"
+
+  container_vol_sa1_name   = "containersa1"
+  container_vol_share_name = "sqlvol"
+  storage_share_quota      = 2
+
+  sql_sa_password_secret_name          = "sql-sa-password"
+  sql_server_user_secret_name          = "sql-server-user"
+  sql_server_user_password_secret_name = "sql-server-user-password"
+  aci_container_repo_tag               = "https://hub.docker.com/r/exoplatform/sqlserver/"
 
   ip_address_type        = "Private"
   os_type                = "Linux"
   container_group1_count = 1
   container_name         = "drh-sql"
   container_image        = "exoplatform/sqlserver:2017-CU8"
+  container_vol_mnt_path = "/var/opt/mssql"
 
   synapse_sql_server_name            = "databrickssql"
   synapse_sa_sql_database_name       = "databrickssqldb"

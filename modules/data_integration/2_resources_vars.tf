@@ -31,8 +31,14 @@ variable "vm_sku" {}
 variable "vm_version" {}
 
 # aci
+# aci private subnet, no public ip
 variable "container_subnet_name" {}
 variable "vnet1_container_subnet_address_prefix2" {}
+# aci volume sa, file share
+variable "container_vol_sa1_name" {}
+variable "container_vol_share_name" {}
+variable "storage_share_quota" {}
+
 variable "contgroup_network_profile_name" {}
 variable "container_group1_name" {}
 variable "ip_address_type" {}
@@ -40,6 +46,8 @@ variable "os_type" {}
 variable "container_group1_count" {}
 variable "container_name" {}
 variable "container_image" {}
+variable "container_vol_mnt_path" {}
 variable "sql_sa_password_secret_name" {}
 variable "sql_server_user_secret_name" {}
 variable "sql_server_user_password_secret_name" {}
+variable "aci_container_repo_tag" {}

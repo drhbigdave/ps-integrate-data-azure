@@ -29,6 +29,25 @@ resource "azurerm_network_profile" "contgroup_network_profile" {
   }
 }
 
+resource "azurerm_storage_account" "container_vol_sa1" {
+  name                     = var.container_vol_sa1_name
+  resource_group_name      = azurerm_resource_group.vnet_infra.name
+  location                 = azurerm_resource_group.vnet_infra.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+
+  network_rules {
+    default_action = "Deny"
+    ip_rules = [data.azurerm_key_vault_secret.shanikas_home_ip.value,
+    data.azurerm_key_vault_secret.davids_home_ip.value]
+    virtual_network_subnet_ids = [azurerm_subnet.vnet1_subnet1.id]
+  }
+}
+resource "azurerm_storage_share" "container_vol_sa1_share1" {
+  name                 = var.container_vol_share_name
+  storage_account_name = azurerm_storage_account.container_vol_sa1.name
+  quota                = var.storage_share_quota
+}
 resource "azurerm_container_group" "container_group1" {
   count               = var.container_group1_count
   name                = var.container_group1_name
@@ -44,8 +63,15 @@ resource "azurerm_container_group" "container_group1" {
     image  = var.container_image
     cpu    = "0.5"
     memory = "1.5"
+    volume {
+      name                 = azurerm_storage_share.container_vol_sa1_share1.name
+      mount_path           = var.container_vol_mnt_path
+      storage_account_name = azurerm_storage_account.container_vol_sa1.name
+      storage_account_key  = azurerm_storage_account.container_vol_sa1.secondary_access_key
+      share_name           = azurerm_storage_share.container_vol_sa1_share1.name
+    }
     environment_variables = {
-      terSQLSERVER_DATABASE = "Pollution",
+      SQLSERVER_DATABASE = "Pollution",
     }
     secure_environment_variables = {
       SA_PASSWORD        = data.azurerm_key_vault_secret.sql_sa_password.value,
@@ -60,6 +86,7 @@ resource "azurerm_container_group" "container_group1" {
   }
 
   tags = {
-    environment = "testing"
+    environment    = "testing"
+    container_repo = var.aci_container_repo_tag
   }
 }
