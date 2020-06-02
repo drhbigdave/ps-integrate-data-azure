@@ -3,15 +3,23 @@ resource "azurerm_subnet" "container_subnet" {
   resource_group_name  = azurerm_resource_group.vnet_infra.name
   virtual_network_name = azurerm_virtual_network.vnet1.name
   address_prefix       = var.vnet1_container_subnet_address_prefix2
+  service_endpoints    = ["Microsoft.Storage"]
 
   delegation {
     name = "contgroupdelegation"
 
     service_delegation {
-      name    = "Microsoft.ContainerInstance/containerGroups"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+      name = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action",
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
     }
   }
+}
+
+resource "azurerm_subnet_network_security_group_association" "containerNSG" {
+  subnet_id                 = azurerm_subnet.container_subnet.id
+  network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
 }
 
 resource "azurerm_network_profile" "contgroup_network_profile" {
@@ -40,7 +48,7 @@ resource "azurerm_storage_account" "container_vol_sa1" {
     default_action = "Deny"
     ip_rules = [data.azurerm_key_vault_secret.shanikas_home_ip.value,
     data.azurerm_key_vault_secret.davids_home_ip.value]
-    virtual_network_subnet_ids = [azurerm_subnet.vnet1_subnet1.id]
+    virtual_network_subnet_ids = [azurerm_subnet.vnet1_subnet1.id, azurerm_subnet.container_subnet.id]
   }
 }
 resource "azurerm_storage_share" "container_vol_sa1_share1" {
@@ -61,8 +69,10 @@ resource "azurerm_container_group" "container_group1" {
   container {
     name   = var.container_name
     image  = var.container_image
-    cpu    = "0.5"
-    memory = "1.5"
+    cpu    = "1.0"
+    memory = "2.0"
+    #commands = ["/entrypoint.sh"]
+
     volume {
       name                 = azurerm_storage_share.container_vol_sa1_share1.name
       mount_path           = var.container_vol_mnt_path
@@ -71,12 +81,15 @@ resource "azurerm_container_group" "container_group1" {
       share_name           = azurerm_storage_share.container_vol_sa1_share1.name
     }
     environment_variables = {
-      SQLSERVER_DATABASE = "Pollution",
+      SQLSERVER_DATABASE = "Pollution"
+      ACCEPT_EULA        = "Y"
+      MSSQL_PID          = "Express"
+
     }
     secure_environment_variables = {
-      SA_PASSWORD        = data.azurerm_key_vault_secret.sql_sa_password.value,
-      SQLSERVER_USER     = data.azurerm_key_vault_secret.sql_server_user.value,
-      SQLSERVER_PASSWORD = data.azurerm_key_vault_secret.sql_server_user_password.value,
+      SA_PASSWORD = data.azurerm_key_vault_secret.sql_sa_password.value
+      #SQLSERVER_USER     = data.azurerm_key_vault_secret.sql_server_user.value
+      #SQLSERVER_PASSWORD = data.azurerm_key_vault_secret.sql_server_user_password.value
     }
 
     ports {

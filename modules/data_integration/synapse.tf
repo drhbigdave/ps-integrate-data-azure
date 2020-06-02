@@ -1,4 +1,5 @@
 resource "azurerm_sql_server" "synapse_sql_server" {
+  count                        = var.synapse_sql_server_count
   name                         = var.synapse_sql_server_name
   location                     = azurerm_resource_group.vnet_infra.location
   resource_group_name          = azurerm_resource_group.vnet_infra.name
@@ -12,18 +13,28 @@ resource "azurerm_sql_server" "synapse_sql_server" {
 }
 
 resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_drh" {
+  count               = var.synapse_sql_server_count
   name                = "davids_home"
   resource_group_name = azurerm_resource_group.vnet_infra.name
-  server_name         = azurerm_sql_server.synapse_sql_server.name
+  server_name         = azurerm_sql_server.synapse_sql_server[count.index].name
   start_ip_address    = data.azurerm_key_vault_secret.davids_home_ip.value
   end_ip_address      = data.azurerm_key_vault_secret.davids_home_ip.value
 }
 resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_sd" {
+  count               = var.synapse_sql_server_count
   name                = "Shanikas_home"
   resource_group_name = azurerm_resource_group.vnet_infra.name
-  server_name         = azurerm_sql_server.synapse_sql_server.name
+  server_name         = azurerm_sql_server.synapse_sql_server[count.index].name
   start_ip_address    = data.azurerm_key_vault_secret.shanikas_home_ip.value
   end_ip_address      = data.azurerm_key_vault_secret.shanikas_home_ip.value
+}
+resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_vnet" {
+  count               = var.synapse_sql_server_count
+  name                = "vnet_rule"
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+  server_name         = azurerm_sql_server.synapse_sql_server[count.index].name
+  start_ip_address    = "10.0.2.0"
+  end_ip_address      = "10.0.3.255"
 }
 /*
 resource "azurerm_storage_account" "synapse_sa" {
@@ -35,10 +46,11 @@ resource "azurerm_storage_account" "synapse_sa" {
 }
 */
 resource "azurerm_sql_database" "synapse_sa_sql_database" {
+  count               = var.synapse_sql_server_count
   name                = var.synapse_sa_sql_database_name
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
-  server_name         = azurerm_sql_server.synapse_sql_server.name
+  server_name         = azurerm_sql_server.synapse_sql_server[count.index].name
   create_mode         = "Default"
   edition             = "Free"
   /*

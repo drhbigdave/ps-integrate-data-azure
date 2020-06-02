@@ -12,9 +12,10 @@ variable "davids_home_ip_secret_name" {}
 variable "shanikas_home_ip_secret_name" {}
 
 # synapse
+variable "synapse_sql_server_count" {}
 variable "synapse_sql_server_name" {}
 variable "synapse_sa_sql_database_name" {}
-variable "permanent_infra_key_vault_name" {}
+variable "permanent_infra_key_vault_name" {} #needed?
 variable "sql_svradmin_login_name_secret" {}
 variable "sql_svradmin_login_password_secret" {}
 # dvsm
@@ -39,6 +40,8 @@ variable "container_vol_sa1_name" {}
 variable "container_vol_share_name" {}
 variable "storage_share_quota" {}
 
+variable "vnet1_nsg2_name" {}
+
 variable "contgroup_network_profile_name" {}
 variable "container_group1_name" {}
 variable "ip_address_type" {}
@@ -51,3 +54,6 @@ variable "sql_sa_password_secret_name" {}
 variable "sql_server_user_secret_name" {}
 variable "sql_server_user_password_secret_name" {}
 variable "aci_container_repo_tag" {}
+
+variable "environment_name" {}
+variable "data_factory_count" {}

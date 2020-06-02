@@ -18,6 +18,7 @@ resource "azurerm_subnet" "vnet1_subnet1" {
   resource_group_name  = azurerm_resource_group.vnet_infra.name
   virtual_network_name = azurerm_virtual_network.vnet1.name
   address_prefix       = var.vnet1_subnet1_address_prefix1
+  service_endpoints    = ["Microsoft.Storage", "Microsoft.Sql"]
 }
 
 /*
@@ -36,6 +37,10 @@ resource "azurerm_network_security_group" "vnet1_nsg" {
     environment = "standard_vm_vnet"
   }
 }
+resource "azurerm_subnet_network_security_group_association" "subnet1NSG" {
+  subnet_id                 = azurerm_subnet.vnet1_subnet1.id
+  network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
+}
 
 resource "azurerm_network_security_rule" "vnet1_nsg1_outrule1" {
   name                        = "outbound"
@@ -45,7 +50,7 @@ resource "azurerm_network_security_rule" "vnet1_nsg1_outrule1" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "*"
-  source_address_prefix       = "*"
+  source_address_prefix       = "10.0.2.0/24"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.vnet_infra.name
   network_security_group_name = azurerm_network_security_group.vnet1_nsg.name
