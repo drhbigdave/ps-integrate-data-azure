@@ -60,6 +60,12 @@ module "data_integration" {
 
   environment_name   = "dev"
   data_factory_count = 1
+
+  sensor_sa_name  = "drhsensordata"
+  container1_name = "sensor-sink-aws"
+  container2_name = "sensor-sink-raw"
+  container3_name = "sensor-sink-realtime"
+  container4_name = "sensor-sink-stage"
 }
 /*
 # use this information for data resources then delete

@@ -57,3 +57,10 @@ variable "aci_container_repo_tag" {}
 
 variable "environment_name" {}
 variable "data_factory_count" {}
+
+#storage
+variable "sensor_sa_name" {}
+variable "container1_name" {}
+variable "container2_name" {}
+variable "container3_name" {}
+variable "container4_name" {}

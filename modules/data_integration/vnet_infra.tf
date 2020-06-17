@@ -37,10 +37,10 @@ resource "azurerm_network_security_group" "vnet1_nsg" {
     environment = "standard_vm_vnet"
   }
 }
-resource "azurerm_subnet_network_security_group_association" "subnet1NSG" {
-  subnet_id                 = azurerm_subnet.vnet1_subnet1.id
-  network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
-}
+#resource "azurerm_subnet_network_security_group_association" "subnet1NSG" {
+#  subnet_id                 = azurerm_subnet.vnet1_subnet1.id
+#  network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
+#}
 
 resource "azurerm_network_security_rule" "vnet1_nsg1_outrule1" {
   name                        = "outbound"

@@ -36,6 +36,14 @@ resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_vnet" {
   start_ip_address    = "10.0.2.0"
   end_ip_address      = "10.0.3.255"
 }
+resource "azurerm_sql_firewall_rule" "synapse_sql_server_fw_rule_AzServices" {
+  count               = var.synapse_sql_server_count
+  name                = "az_services_rule"
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+  server_name         = azurerm_sql_server.synapse_sql_server[count.index].name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
 /*
 resource "azurerm_storage_account" "synapse_sa" {
   name                     = var.synapse_sa_name
