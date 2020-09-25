@@ -64,3 +64,4 @@ variable "container1_name" {}
 variable "container2_name" {}
 variable "container3_name" {}
 variable "container4_name" {}
+#variable "dsvm_sys_assigned_identity" {}

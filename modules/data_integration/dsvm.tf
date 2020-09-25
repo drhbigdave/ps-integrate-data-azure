@@ -1,5 +1,5 @@
 resource "azurerm_public_ip" "dvsm_public_ip" {
-  count                   = var.dsvm_count
+  #count                   = var.dsvm_count
   name                    = "dsvm_public_ip"
   location                = azurerm_resource_group.vnet_infra.location
   resource_group_name     = azurerm_resource_group.vnet_infra.name
@@ -12,7 +12,7 @@ resource "azurerm_public_ip" "dvsm_public_ip" {
 }
 
 resource "azurerm_network_interface" "dsvm_int" {
-  count               = var.dsvm_count
+  #count               = var.dsvm_count
   name                = var.network_interface_name
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
@@ -21,12 +21,12 @@ resource "azurerm_network_interface" "dsvm_int" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.vnet1_subnet1.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.dvsm_public_ip[count.index].id
+    public_ip_address_id          = azurerm_public_ip.dvsm_public_ip.id
   }
 }
 
 resource "azurerm_network_interface_security_group_association" "dsvm_assoc" {
-  network_interface_id      = azurerm_network_interface.dsvm_int[0].id
+  network_interface_id      = azurerm_network_interface.dsvm_int.id
   network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
 }
 
@@ -39,7 +39,7 @@ resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
   admin_username      = var.adminuser_name
   admin_password      = data.azurerm_key_vault_secret.dsvm_admin_password.value
   network_interface_ids = [
-    azurerm_network_interface.dsvm_int[count.index].id,
+    azurerm_network_interface.dsvm_int.id,
   ]
   timeouts {
     create = "45m"
@@ -57,4 +57,13 @@ resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
     sku       = var.vm_sku
     version   = var.vm_version
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
+/*
+output "principal_id" {
+  value = azurerm_windows_virtual_machine.dsvm_vm1[0].identity[0].principal_id
+}
+*/

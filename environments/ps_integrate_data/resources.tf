@@ -66,6 +66,7 @@ module "data_integration" {
   container2_name = "sensor-sink-raw"
   container3_name = "sensor-sink-realtime"
   container4_name = "sensor-sink-stage"
+  #dsvm_sys_assigned_identity = module.data_integratiom.dsvm_sys_assigned_identity
 }
 /*
 # use this information for data resources then delete
