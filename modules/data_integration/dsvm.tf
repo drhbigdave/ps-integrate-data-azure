@@ -62,8 +62,8 @@ resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
     type = "SystemAssigned"
   }
 }
-/*
+
 output "principal_id" {
   value = azurerm_windows_virtual_machine.dsvm_vm1[0].identity[0].principal_id
 }
-*/
+

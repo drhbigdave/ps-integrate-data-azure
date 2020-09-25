@@ -24,14 +24,14 @@ resource "azurerm_storage_container" "container1" {
   storage_account_name  = azurerm_storage_account.sensor_sa.name
   container_access_type = "private"
 }
-
+/*
 resource "azurerm_role_assignment" "container1_access_assignment" {
   #count = var.dsvm_count
   scope                = "ddddddd"
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = "sssssssssss"
 }
-
+*/
 resource "azurerm_storage_container" "container2" {
   name                  = var.container2_name
   storage_account_name  = azurerm_storage_account.sensor_sa.name
