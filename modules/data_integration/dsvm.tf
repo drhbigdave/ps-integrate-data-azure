@@ -1,5 +1,18 @@
+locals {
+  vm_datadiskdisk_count_map = { for k in toset(var.instances) : k => var.nb_disks_per_instance }
+  luns                      = { for k in local.datadisk_lun_map : k.datadisk_name => k.lun }
+  datadisk_lun_map = flatten([
+    for vm_name, count in local.vm_datadiskdisk_count_map : [
+      for i in range(count) : {
+        datadisk_name = format("datadisk_%s_disk%02d", vm_name, i)
+        lun           = i
+      }
+    ]
+  ])
+}
+
+
 resource "azurerm_public_ip" "dvsm_public_ip" {
-  #count                   = var.dsvm_count
   name                    = "dsvm_public_ip"
   location                = azurerm_resource_group.vnet_infra.location
   resource_group_name     = azurerm_resource_group.vnet_infra.name
@@ -12,7 +25,6 @@ resource "azurerm_public_ip" "dvsm_public_ip" {
 }
 
 resource "azurerm_network_interface" "dsvm_int" {
-  #count               = var.dsvm_count
   name                = var.network_interface_name
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
@@ -31,39 +43,41 @@ resource "azurerm_network_interface_security_group_association" "dsvm_assoc" {
 }
 
 resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
-  count               = var.dsvm_count
-  name                = var.dsvm_vm1_name
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
-  size                = var.vm_size
-  admin_username      = var.adminuser_name
+  for_each            = toset(var.vms)
+  name                = var.vm_values[each.value].name
+  size                = var.vm_values[each.value].size
+  admin_username      = var.vm_values[each.value].admin_username
   admin_password      = data.azurerm_key_vault_secret.dsvm_admin_password.value
   network_interface_ids = [
-    azurerm_network_interface.dsvm_int.id,
+    azurerm_network_interface.dsvm_int.id
   ]
-  timeouts {
-    create = "45m"
-    delete = "30m"
-  }
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = var.vm_os_disk_sa_type #Standard_LRS, StandardSSD_LRS and Premium_LRS
+    storage_account_type = var.vm_values[each.value].os_storage_account_type #Standard_LRS, StandardSSD_LRS and Premium_LRS
   }
 
   source_image_reference {
-    publisher = var.vm_publisher
-    offer     = var.vm_offer
-    sku       = var.vm_sku
-    version   = var.vm_version
+    publisher = var.vm_values[each.value].image_publisher
+    offer     = var.vm_values[each.value].image_offer
+    sku       = var.vm_values[each.value].image_sku
+    version   = var.vm_values[each.value].image_version
   }
 
   identity {
-    type = "SystemAssigned"
+    type = var.vm_values[each.value].identity_type
   }
 }
 
 output "principal_id" {
-  value = azurerm_windows_virtual_machine.dsvm_vm1[0].identity[0].principal_id
+  #value = azurerm_windows_virtual_machine.dsvm_vm1["vm1"].identity[0].principal_id
+  #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1[each.key].identity : attribute.principal_id]
+  #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1 : attribute.identity["principal_id"]]
+  #value = {for k, v in azurerm_windows_virtual_machine.dsvm_vm1[0].identity : k => v.tenant_id}
+  #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1[each.key].identity : attribute[each.key].principal_id]
+  value = { for k, v in azurerm_windows_virtual_machine.dsvm_vm1 : k => v.identity[0].principal_id}
+  #value = [ for vm in azurerm_windows_virtual_machine.dsvm_vm1 : for v in vm.identity => v.principal_id ]
 }
 

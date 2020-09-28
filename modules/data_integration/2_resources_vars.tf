@@ -19,17 +19,24 @@ variable "permanent_infra_key_vault_name" {} #needed?
 variable "sql_svradmin_login_name_secret" {}
 variable "sql_svradmin_login_password_secret" {}
 # dvsm
+variable "vms" {
+    type = list(string)
+}
+variable "vm_values" {
+  type = map(object({
+    name                    = string
+    size                    = string
+    admin_username          = string
+    os_storage_account_type = string
+    image_publisher         = string
+    image_offer             = string
+    image_sku               = string
+    image_version           = string
+    identity_type           = string
+  }))
+}
 variable "network_interface_name" {}
 variable "dsvm_admin_password_secret_name" {}
-variable "dsvm_count" {}
-variable "dsvm_vm1_name" {}
-variable "vm_size" {}
-variable "vm_os_disk_sa_type" {}
-variable "adminuser_name" {}
-variable "vm_publisher" {}
-variable "vm_offer" {}
-variable "vm_sku" {}
-variable "vm_version" {}
 
 # aci
 # aci private subnet, no public ip
@@ -64,4 +71,24 @@ variable "container1_name" {}
 variable "container2_name" {}
 variable "container3_name" {}
 variable "container4_name" {}
+
+# locals learning test
+variable "instances" {}
+variable "nb_disks_per_instance" {}
+variable "tags" {}
+
+
+/*
+# scratch
 #variable "dsvm_sys_assigned_identity" {}
+variable "dsvm_count" {}
+variable "dsvm_vm1_name" {}
+variable "vm_size" {}
+variable "vm_os_disk_sa_type" {}
+variable "adminuser_name" {}
+variable "vm_publisher" {}
+variable "vm_offer" {}
+variable "vm_sku" {}
+variable "vm_version" {}
+
+*/

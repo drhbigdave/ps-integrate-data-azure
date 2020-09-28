@@ -15,19 +15,21 @@ module "data_integration" {
   # keep networking above for easy re-use for other VMs, VM below
   network_interface_name          = "dsvm01-nic0"
   dsvm_admin_password_secret_name = "dsvm-admin-password"
-  dsvm_count                      = 1
-  dsvm_vm1_name                   = "dsvm01"
-  vm_size                         = "Standard_B4ms"   #Standard_DS3_v2
-  vm_os_disk_sa_type              = "StandardSSD_LRS" #Standard_LRS, StandardSSD_LRS and Premium_LRS
-  adminuser_name                  = "dsvmadmin0"
-  #vm_publisher                    = "microsoft-dsvm"
-  #vm_offer                        = "dsvm-win-2019"
-  #vm_sku                          = "server-2019-g2"
-  #vm_version                      = "latest"
-  vm_publisher = "MicrosoftWindowsServer"
-  vm_offer     = "WindowsServer"
-  vm_sku       = "2019-datacenter-gensecond"
-  vm_version   = "latest"
+  vms = ["dsvm01"]
+  vm_values = {
+    dsvm01 = {
+      name                    = "dsvm01"
+      size                    = "Standard_B4ms"
+      admin_username          = "dsvmadmin0"
+      os_storage_account_type = "StandardSSD_LRS"
+      image_publisher         = "MicrosoftWindowsServer"
+      image_offer             = "WindowsServer"
+      image_sku               = "2019-datacenter-gensecond"
+      image_version           = "latest"
+      identity_type           = "SystemAssigned"
+    }
+  }
+
   #ACI
   container_subnet_name                  = "container_subnet_dot3"
   vnet1_container_subnet_address_prefix2 = "10.0.3.0/24"
@@ -67,8 +69,16 @@ module "data_integration" {
   container3_name = "sensor-sink-realtime"
   container4_name = "sensor-sink-stage"
   #dsvm_sys_assigned_identity = module.data_integratiom.dsvm_sys_assigned_identity
+
+  instances = ["vm-instance1","vm-instance2","vm-instance3"]
+  nb_disks_per_instance = 2
+  tags = {
+  environment = "test"
+}
+
 }
 /*
+## scratch stuff
 # use this information for data resources then delete
 module "permanent_infra" {
   source                          = "../../../modules/permanent_infra"
@@ -80,4 +90,16 @@ module "permanent_infra" {
   davids_home_ip_secret_name      = "davids-home-ip"
   shanikas_home_ip_secret_name    = "shanikas-home-ip"
 }
+  dsvm_vm1_name      = "dsvm01"
+  vm_size            = "Standard_B4ms"   #Standard_DS3_v2
+  vm_os_disk_sa_type = "StandardSSD_LRS" #Standard_LRS, StandardSSD_LRS and Premium_LRS
+  adminuser_name     = "dsvmadmin0"
+  vm_publisher = "MicrosoftWindowsServer"
+  vm_offer     = "WindowsServer"
+  vm_sku       = "2019-datacenter-gensecond"
+  vm_version   = "latest"
+  #vm_publisher                    = "microsoft-dsvm"
+  #vm_offer                        = "dsvm-win-2019"
+  #vm_sku                          = "server-2019-g2"
+  #vm_version                      = "latest"
 */
