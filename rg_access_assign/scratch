@@ -1,20 +1,3 @@
-ds00eacsactivitylogs-key1
-spark.conf.set(
-    "fs.azure.account.key.ds00eacsactivitylogs.dfs.core.usgovcloudapi.net/",
-    dbutils.secrets.get(scope="storage-access",key="ds00eacsactivitylogs-key1"))
-
-
-
-
-
-curl -X GET -H 'Content-Type: application/x-www-form-urlencoded' \
--d 'grant_type=client_credentials&client_id=65e27ef1-1e48-4f72-9025-dbb1ca59a577&resource=2ff814a6-3304-4ab8-85cb-cd0e6f879c1d&client_secret=ES~e-Km92rlh8gp.niA2WIEuPgU1FG-q~u' \
-https://login.microsoftonline.com/f1b5c43e-c5a8-4c0e-afba-cf631e137849/oauth2/token
-
-
-[for k, v in aws_instance.example : v.id]
-
-
 The sizes available in the current region are: Standard_B1ls,Standard_B1ms,
 Standard_B1s,Standard_B2ms,Standard_B2s,Standard_B4ms,Standard_B8ms,Standard_B12ms,
 Standard_B16ms,Standard_B20ms,Standard_DS1_v2,Standard_DS2_v2,Standard_DS3_v2,

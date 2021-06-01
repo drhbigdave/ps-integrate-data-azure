@@ -11,9 +11,17 @@ locals {
   ])
 }
 
+data "azurerm_user_assigned_identity" "data_rg_access" {
+  name                = "devm01-access"
+  resource_group_name = azurerm_resource_group.vnet_infra.name
+}
 
-resource "azurerm_public_ip" "dvsm_public_ip" {
-  name                    = "dsvm_public_ip"
+output "user_assigned_id_principal_id" {
+  value = data.azurerm_user_assigned_identity.data_rg_access.principal_id
+}
+
+resource "azurerm_public_ip" "vm_public_ip" {
+  name                    = "vm_public_ip"
   location                = azurerm_resource_group.vnet_infra.location
   resource_group_name     = azurerm_resource_group.vnet_infra.name
   allocation_method       = "Dynamic"
@@ -24,8 +32,8 @@ resource "azurerm_public_ip" "dvsm_public_ip" {
   }
 }
 
-resource "azurerm_network_interface" "dsvm_int" {
-  name                = var.network_interface_name
+resource "azurerm_network_interface" "vm_int" {
+  name                = "${var.network_interface_name}-de01"
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
 
@@ -33,16 +41,16 @@ resource "azurerm_network_interface" "dsvm_int" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.vnet1_subnet1.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.dvsm_public_ip.id
+    public_ip_address_id          = azurerm_public_ip.vm_public_ip.id
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "dsvm_assoc" {
-  network_interface_id      = azurerm_network_interface.dsvm_int.id
+resource "azurerm_network_interface_security_group_association" "vm_assoc" {
+  network_interface_id      = azurerm_network_interface.vm_int.id
   network_security_group_id = azurerm_network_security_group.vnet1_nsg.id
 }
 
-resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
+resource "azurerm_windows_virtual_machine" "vm" {
   location            = azurerm_resource_group.vnet_infra.location
   resource_group_name = azurerm_resource_group.vnet_infra.name
   for_each            = toset(var.vms)
@@ -51,7 +59,7 @@ resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
   admin_username      = var.vm_values[each.value].admin_username
   admin_password      = data.azurerm_key_vault_secret.dsvm_admin_password.value
   network_interface_ids = [
-    azurerm_network_interface.dsvm_int.id
+    azurerm_network_interface.vm_int.id
   ]
 
   os_disk {
@@ -67,17 +75,24 @@ resource "azurerm_windows_virtual_machine" "dsvm_vm1" {
   }
 
   identity {
-    type = var.vm_values[each.value].identity_type
+    #type = var.vm_values[each.value].identity_type
+    type = "UserAssigned"
+    #identity_ids = output.user_assigned_id_principal_id #output not declared error
+    #identity_ids = data.azurerm_user_assigned_identity.data_rg_access.principal_id #invalid value for "v" parameter 
+    identity_ids = [
+      data.azurerm_user_assigned_identity.data_rg_access.id,
+    ]
   }
 }
-
+/*
 output "principal_id" {
-  #value = azurerm_windows_virtual_machine.dsvm_vm1["vm1"].identity[0].principal_id
+  value = azurerm_windows_virtual_machine.vm["devm01"].identity[0].principal_id
   #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1[each.key].identity : attribute.principal_id]
   #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1 : attribute.identity["principal_id"]]
   #value = {for k, v in azurerm_windows_virtual_machine.dsvm_vm1[0].identity : k => v.tenant_id}
   #value = [for attribute in azurerm_windows_virtual_machine.dsvm_vm1[each.key].identity : attribute[each.key].principal_id]
-  value = { for k, v in azurerm_windows_virtual_machine.dsvm_vm1 : k => v.identity[0].principal_id}
+  #value = { for k, v in azurerm_windows_virtual_machine.vm : k => v.identity[0].principal_id}
   #value = [ for vm in azurerm_windows_virtual_machine.dsvm_vm1 : for v in vm.identity => v.principal_id ]
 }
 
+*/

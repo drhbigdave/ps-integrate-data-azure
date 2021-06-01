@@ -13,7 +13,7 @@ resource "azurerm_storage_account_network_rules" "test" {
   resource_group_name  = azurerm_resource_group.vnet_infra.name
   storage_account_name = azurerm_storage_account.sensor_sa.name
 
-  default_action             = "Deny"
+  default_action             = "Allow"
   ip_rules                   = [data.azurerm_key_vault_secret.davids_home_ip.value, data.azurerm_key_vault_secret.shanikas_home_ip.value]
   virtual_network_subnet_ids = [azurerm_subnet.container_subnet.id, azurerm_subnet.vnet1_subnet1.id]
   bypass                     = ["AzureServices"]
@@ -23,13 +23,6 @@ resource "azurerm_storage_container" "container1" {
   name                  = var.container1_name
   storage_account_name  = azurerm_storage_account.sensor_sa.name
   container_access_type = "private"
-}
-
-resource "azurerm_role_assignment" "container1_access_assignment" {
-  #count = length(var.vms)
-  scope                = azurerm_resource_group.vnet_infra.id
-  role_definition_name = "Storage Blob Data Reader"
-  principal_id         = azurerm_windows_virtual_machine.dsvm_vm1["vm1"].identity[0].principal_id
 }
 
 resource "azurerm_storage_container" "container2" {

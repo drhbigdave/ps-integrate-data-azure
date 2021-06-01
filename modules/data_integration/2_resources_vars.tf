@@ -20,7 +20,7 @@ variable "sql_svradmin_login_name_secret" {}
 variable "sql_svradmin_login_password_secret" {}
 # dvsm
 variable "vms" {
-    type = list(string)
+  type = list(string)
 }
 variable "vm_values" {
   type = map(object({
@@ -77,6 +77,35 @@ variable "instances" {}
 variable "nb_disks_per_instance" {}
 variable "tags" {}
 
+# old vm deployment
+variable "dsvm_count" {}
+variable "dsvm_vm1_name" {}
+variable "vm_size" {}
+variable "vm_os_disk_sa_type" {}
+variable "adminuser_name" {}
+variable "vm_publisher" {}
+variable "vm_offer" {}
+variable "vm_sku" {}
+variable "vm_version" {}
+/*
+# functions
+variable "app_service_plan_name" {}
+variable "app_service_plan_sku_tier" {}
+variable "app_service_plan_sku_size" {}
+variable "app_service_function_name" {}
+variable "functions_storage_account_name" {}
+variable "functions_storage_account_primary_access_key" {}
+variable "consumption_plan_name" {}
+variable "consumption_plan_kind" {}
+variable "consumption_plan_sku_tier" {}
+variable "consumption_plan_sku_size" {}
+variable "consumption_function_name" {}
+variable "consumption_linux_plan" {}
+variable "consumption_linux_plan_kind" {}
+variable "consumption_linux_plan_sku_tier" {}
+variable "consumption_linux_plan_sku_size" {}
+variable "consumption_linux_function_name" {}
+variable "consumption_linux_function_os_type" {}
 
 /*
 # scratch
